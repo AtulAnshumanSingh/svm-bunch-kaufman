@@ -7,9 +7,9 @@ def bunch_kaufman(A):
     
     for index in range(0,N):
         
-        A[index,index+1:] = 0
+        A[index,index+1:] = 0.0
     
-    L = np.matrix(np.eye(N,N))
+    L = np.matrix(np.eye(N,N), dtype = np.float64)
     
     alpha = (1 + np.sqrt(17))/8
     
@@ -54,7 +54,6 @@ def bunch_kaufman(A):
                 pivot[k] = 1
                 k = k + 1
 
-                
             else:
                 
                 if np.abs(A[r,r]) >= alpha*lambda_r:
@@ -124,180 +123,19 @@ def bunch_kaufman(A):
     
     for ind in range(0,N - 1):
 
-        A[ind, ind + 1:] = 0
+        A[ind, ind + 1:] = 0.0
                 
     return A, L, P - 1, pivot
 
+def solve(A, b):
+    
+    D, L, P, pivot = bunch_kaufman(copy.deepcopy(A))
+    
+    LHS = b[P]
 
-def solve(A, P, b):
-    
-    N = A.shape[0]
-    
-    i = 0
-    
-    while i < N - 1:
+    y = np.linalg.solve(L*D,LHS)
         
-        if i < N:
-                 
-            ip1 = i + 1
-            save = b[P[i]]
-            
-            if P[ip1] > 0:
-                
-                print("This Case")
-                
-                b[P[i]] = b[i]
-                if A[i,i] == 0:
-                    print("Fail")
-                
-                b[i] = save / A[i,i]
-                
-                for j in range(ip1, N):
-                    
-                    b[j] = b[j] + A[i,j]*save
-                
-                i = ip1
-                
-            else:
-            
-                temp = b[i]
-                b[P[i]] = b[ip1]
-                det = P[ip1]
-                
-                b[i] = (temp * A[ip1,ip1] - save * A[i,ip1])/det
-                b[ip1] = (save * A[i,i] - temp * A[i,ip1])/det
-                
-                for j in range(i + 2, N):
-                    
-                    b[j] = b[j] + A[i,j] * temp + A[ip1, j] * save
-                
-                i = i + 2
-        
-    if i == N - 1:
-        
-        if A[i,i] == 0:
-            
-            raise "Fail"
-        
-        b[i] = b[i]/A[i,i]
-        
-        i = N - 1
-        
-    else: 
-        
-        i = N - 2
-
+    x = np.linalg.solve(L.T,y)
     
-    while i > 0:
-        
-        if i > 0:
-            
-            if P[i] < 0:
-                
-                ii = i - 1
-            
-            else:
-                
-                ii = i
-                
-        for k in range(ii,i):
-            
-            save = b[k]
-            
-            for j in range(i + 1, N):
-                
-                save = save + A[k,j] * b[j]
-            
-            b[k] = save
-        
-        b[i] = b[P[ii]]
-        b[P[ii]] = save
-        
-        i = ii - 1
+    return x
     
-    return b
-    
-    
-solve(A, P, b)
-      
-#Example 1
-A = np.matrix([[6,12,3,-6],
-              [12,-8,-13,4],
-              [3,-13,-7,1],
-              [-6,4,1,6]],dtype = np.float32)
-    
-    
-A_ = np.matrix([[6,12,3,-6],
-              [12,-8,-13,4],
-              [3,-13,-7,1],
-              [-6,4,1,6]],dtype = np.float32)
-    
-#Example 2    
-A = np.matrix([[-3,-3,-18,-30,18],
-              [-3,-1,-4,-48,8],
-              [-18,-4,-6,-274,6],
-              [-30,-48,-274,119,19],
-              [18, 8, 6, 19, 216]],dtype = np.float32)
-    
-    
-A_ = np.matrix([[-3,-3,-18,-30,18],
-              [-3,-1,-4,-48,8],
-              [-18,-4,-6,-274,6],
-              [-30,-48,-274,119,19],
-              [18, 8, 6, 19, 216]],dtype = np.float32)
-
-#Example 3
-A = np.matrix([[-4,0,-16,-32,28],
-              [0,1,5,10,-6],
-              [-16,5,-37,-66,64],
-              [-32,10,-66,-85,53],
-              [28,-6,64,53,-15]],dtype = np.float32)
-    
-A_ = np.matrix([[-4,0,-16,-32,28],
-              [0,1,5,10,-6],
-              [-16,5,-37,-66,64],
-              [-32,10,-66,-85,53],
-              [28,-6,64,53,-15]],dtype = np.float32)
-    
-    
-    
-    
-D, L, P, pivot = bunch_kaufman(A)
-
-L = L + L.T
-
-'''
-for index in range(0, 5):
-    
-    L[index,index] = D[index,index] 
-'''
-
-#Example 2
-b = np.matrix([327, 291, 1290, 275, 1720]).T
-
-#Example 3
-b = np.matrix([448, -111, 1029, 1207, -719]).T
-
-P_ = np.matrix(np.eye(5,5)[:,P])
-
-LHS = b[P]
-
-y = np.linalg.solve(L*D,LHS)
-
-L_ = L*D
-
-LHS = LHS/L[0,0]
-
-for i in range(1,len(L_)):
-    
-    LHS = LHS - 
-
-x = np.linalg.solve(L.T,y)
-
-np.round(L*D*L.T)
-
-dxyz = P_*(np.linalg.inv(L*D*L.T)*(P_.T*b))
-
-_A = copy.deepcopy(L)
-
-solve(_A, P, copy.deepcopy(b))
